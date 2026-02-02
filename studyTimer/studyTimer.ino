@@ -9,9 +9,9 @@
 #include "GUI_Paint.h"
 #include "fonts.h"
 
-// 공부 제어 / 휴식 제어용 버튼 이름 지정
-#define BTN_STUDY  2
-#define BTN_REST   3
+// 전원(전체 시작 / 정지) / 모드 제어용 버튼 이름 지정
+#define BTN_POWER  2
+#define BTN_MODE   3
 
 // 코딩에서 사용할 변수 선언
 // enum = 숫자에 의미 있는 이름을 붙이는 방법
@@ -110,8 +110,8 @@ void setup() {
   Wire.begin();
 
   // 버튼 핀 설정
-  pinMode(BTN_STUDY, INPUT_PULLUP);
-  pinMode(BTN_REST,  INPUT_PULLUP);
+  pinMode(BTN_POWER, INPUT_PULLUP);
+  pinMode(BTN_MODE,  INPUT_PULLUP);
 
   // RTC 모듈 시작
   rtc.begin();
@@ -130,7 +130,7 @@ void setup() {
 }
 
 void loop() {
-  handleStudyButton();                // 공부 제어 버튼 제어 함수 불러오기
+  handlePowerButton();                // 공부 제어 버튼 제어 함수 불러오기
 
   if (!powerOn) return;               // powerOn 변수가 0이면 반환
 
@@ -139,14 +139,14 @@ void loop() {
     return;
   }
 
-  handleRestButton();                 // 휴식 제어 버튼 제어 함수 불러오기
+  handleModeButton();                 // 휴식 제어 버튼 제어 함수 불러오기
   updateRTC();                        // RTC 제어 함수 불러오기
   updateDisplay();                    // EPD 제어 함수 불러오기
 }
 
-void handleStudyButton() {              // 공부 시작/중지 제어 함수
+void handlePowerButton() {              // 공부 시작/중지 제어 함수
   static bool lastBtn = HIGH;
-  bool btn = digitalRead(BTN_STUDY);    // 공부 버튼 입력 값 받아오기
+  bool btn = digitalRead(BTN_POWER);    // 공부 버튼 입력 값 받아오기
 
   // 함수 끝에 lastBtn에 btn 값을 넣어주고, 이전 값과 비교하여 다를 때 동작되도록 설정
   if (lastBtn == HIGH && btn == LOW) {
@@ -171,9 +171,9 @@ void handleStudyButton() {              // 공부 시작/중지 제어 함수
   lastBtn = btn;
 }
 
-void handleRestButton() {               // 휴식 시작/중지 제어 함수
+void handleModeButton() {               // 휴식 시작/중지 제어 함수
   static bool lastBtn = HIGH;
-  bool btn = digitalRead(BTN_REST);
+  bool btn = digitalRead(BTN_MODE);
 
   if (lastBtn == HIGH && btn == LOW) {
     // state 가 STUDY면 REST로, STUDY가 아니면 STUDY로 값 지정
@@ -225,8 +225,8 @@ void updateDisplay() {            // EPD 업데이트 함수
   Paint_DrawString_EN(10, 60, buf, &Font16, BLACK, WHITE);
 
   // 각 사용 버튼 설명 기입
-  Paint_DrawString_EN(10, 100, "BTN2: STUDY START/STOP", &Font12, BLACK, WHITE);
-  Paint_DrawString_EN(10, 115, "BTN3: REST START/STOP",  &Font12, BLACK, WHITE);
+  Paint_DrawString_EN(10, 100, "BTN2: Power BUTTON", &Font12, BLACK, WHITE);
+  Paint_DrawString_EN(10, 115, "BTN3: Mode Control", &Font12, BLACK, WHITE);
 
   // EPD 부분 갱신
   EPD_2IN9_V2_Display_Partial(BlackImage);
